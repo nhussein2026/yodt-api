@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const postRoutes = require('./routes/postRoutes'); // Import post routes
 require('dotenv').config();
 
 const app = express();
@@ -22,6 +23,9 @@ app.use('/users', userRoutes);
 
 // Admin routes
 app.use('/admin', adminRoutes);
+
+// Post routes
+app.use('/posts', postRoutes); // Use post routes
 
 // Start the server
 const PORT = process.env.PORT || 3000;

@@ -59,7 +59,7 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'superadmin'],
+        enum: ['user', 'admin', 'superAdmin'],
         default: 'user'
     },
     isConfirmed: {
