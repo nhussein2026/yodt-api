@@ -1,23 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const config = require('./config/config');
-const userRoutes = require('./routes/user');
-const adminRoutes = require('./routes/admin');
-const { mockAuth } = require('./middleware/auth');
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 require('dotenv').config();
 
 const app = express();
 
 app.use(express.json());
-app.use(mockAuth); // Apply mock authentication for all routes
 
-// MongoDB connection
-mongoose.connect(config.mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB
+const connectDB = require('./config/db');
+connectDB();
 
 // Basic route
 app.get('/', (req, res) => {
@@ -29,5 +22,9 @@ app.use('/users', userRoutes);
 
 // Admin routes
 app.use('/admin', adminRoutes);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 module.exports = app;
