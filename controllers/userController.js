@@ -48,3 +48,25 @@ exports.getAllUsers = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+
+// Update volunteering hours for a user
+exports.updateVolunteeringHours = async (req, res) => {
+    const { userId, hours } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.volunteeringHours += hours;
+        await user.save();
+
+        res.json({ message: 'Volunteering hours updated successfully', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ServiceSchema = new Schema({
+const VolunteeringSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -12,24 +12,30 @@ const ServiceSchema = new Schema({
         required: true,
         trim: true
     },
-    photos: {
-        type: [String],
-        required: false
+    location: {
+        type: String,
+        required: true,
+        trim: true
     },
-    cost: {
-        type: Number,
+    date: {
+        type: Date,
+        required: true
+    },
+    time: { //total hours for the task
+        type: String,
         required: true
     },
     requirements: {
         type: [String],
         required: false
     },
-    conditions: {
+    contactInformation: {
         type: String,
-        required: false
+        required: true,
+        trim: true
     }
 }, {
     timestamps: true
 });
 
-module.exports = mongoose.model('Service', ServiceSchema);
+module.exports = mongoose.model('Volunteering', VolunteeringSchema);
