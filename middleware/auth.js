@@ -17,7 +17,6 @@ const authenticateJWT = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET); // Assuming JWT_SECRET is set in environment variables
         req.user = await User.findById(decoded.id);
-        
         if (!req.user) {
             return res.status(401).json({ msg: 'Access denied. User not found.' });
         }

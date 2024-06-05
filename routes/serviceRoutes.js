@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { getServices, getServiceById, createService, updateService, deleteService } = require('../controllers/serviceController');
+const { getAllServices, getServiceById, createService, updateService, deleteService } = require('../controllers/serviceController');
 const { authenticateJWT, isAdminOrSuperAdmin, isConfirmed } = require('../middleware/auth');
 
 // Get all services
-router.get('/', authenticateJWT, isConfirmed, getServices);
+router.get('/', getAllServices);
 
 // Get service by ID
-router.get('/:id', authenticateJWT, isConfirmed, getServiceById);
+router.get('/:id',  getServiceById);
 
 // Create a new service
 router.post('/', authenticateJWT, isConfirmed, isAdminOrSuperAdmin, createService);

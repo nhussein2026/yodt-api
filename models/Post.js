@@ -17,7 +17,7 @@ const postSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['news', 'activity', 'post', 'discounts', 'visits'],
+        enum: ['news', 'activity', 'post', 'discounts', 'visits', 'service'],
         required: true
     },
     createdAt: {

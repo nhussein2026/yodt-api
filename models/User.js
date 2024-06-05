@@ -38,19 +38,15 @@ const UserSchema = new mongoose.Schema(
     studyingYear: {
       type: Number,
       required: [true, "Studying year is required"],
-      min: [1, "Studying year must be at least 1"],
-      max: [8, "Studying year must be at most 8"],
     },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required"],
       trim: true,
-      match: [/^\d{10}$/, "Please enter a valid 10-digit phone number"],
+      match: [/^\d+$/, "Please enter a valid phone number"],
     },
     membershipId: {
       type: String,
-      required: [true, "Membership ID is required"],
-      unique: true,
       trim: true,
     },
     password: {
@@ -71,6 +67,16 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    applicationStatus: {
+      type: String,
+      enum: ["Submitted", "Pending Review", "Approved", "Rejected"],
+      default: "Submitted",
+    },
+    trackingCode: {
+      type: String,
+      unique: true,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -83,7 +89,24 @@ UserSchema.pre("save", async function (next) {
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
+    next();
 });
+
+// Trigger notification to admins upon user registration
+UserSchema.post('save', async function (doc) {
+  if (doc.isNew) {
+    try {
+      const admins = await this.model('User').find({ role: 'admin' });
+      const message = `New user registered: ${doc.username}`;
+      for (const admin of admins) {
+        const notification = new Notification({ userId: admin._id, message });
+        await notification.save();
+      }
+    } catch (error) {
+      console.error('Error notifying admins:', error);
+    }
+  }
+});
+
 
 module.exports = mongoose.model("User", UserSchema);

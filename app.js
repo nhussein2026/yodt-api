@@ -6,8 +6,16 @@ const postRoutes = require('./routes/postRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const volunteeringRoutes = require('./routes/volunteeringRoutes')
 require('dotenv').config();
+const cors = require('cors');
+
 
 const app = express();
+
+// Enable All CORS Requests
+// Configure CORS
+app.use(cors({
+    origin: 'http://localhost:3001', // Allow requests from this origin
+}));
 
 app.use(express.json());
 

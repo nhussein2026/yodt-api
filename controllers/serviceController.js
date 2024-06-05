@@ -1,7 +1,7 @@
 const Service = require('../models/Services');
 
 // Get all services
-const getServices = async (req, res) => {
+const getAllServices = async (req, res) => {
     try {
         const services = await Service.find();
         res.json(services);
@@ -62,4 +62,4 @@ const deleteService = async (req, res) => {
     }
 };
 
-module.exports = { getServices, getServiceById, createService, updateService, deleteService };
+module.exports = { getAllServices, getServiceById, createService, updateService, deleteService };
