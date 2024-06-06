@@ -38,6 +38,10 @@ router.get('/notifications', authenticateJWT, isAdminOrSuperAdmin, userControlle
 // Update notification status
 router.put('/notifications/:notificationId', authenticateJWT, isAdminOrSuperAdmin, userController.updateNotificationStatus);
 
+// Delete a user by ID
+router.delete('/:userId', authenticateJWT, userController.deleteUser);
 
+// Update a user by ID
+router.put('/:userId', authenticateJWT, userController.updateUser);
 
 module.exports = router;

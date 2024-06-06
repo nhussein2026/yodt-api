@@ -20,30 +20,14 @@ exports.registerUser = async (req, res) => {
     const errors = {};
 
     // Check if all required fields are present
-    if (!name) {
-      errors.name = "Name is required.";
-    }
-    if (!username) {
-      errors.username = "Username is required.";
-    }
-    if (!email) {
-      errors.email = "Email is required.";
-    }
-    if (!universityName) {
-      errors.universityName = "University name is required.";
-    }
-    if (!studentId) {
-      errors.studentId = "Student ID is required.";
-    }
-    if (!studyingYear) {
-      errors.studyingYear = "Studying year is required.";
-    }
-    if (!phoneNumber) {
-      errors.phoneNumber = "Phone number is required.";
-    }
-    if (!password) {
-      errors.password = "Password is required.";
-    }
+    if (!name) errors.name = "Name is required.";
+    if (!username) errors.username = "Username is required.";
+    if (!email) errors.email = "Email is required.";
+    if (!universityName) errors.universityName = "University name is required.";
+    if (!studentId) errors.studentId = "Student ID is required.";
+    if (!studyingYear) errors.studyingYear = "Studying year is required.";
+    if (!phoneNumber) errors.phoneNumber = "Phone number is required.";
+    if (!password) errors.password = "Password is required.";
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ errors });
@@ -63,6 +47,13 @@ exports.registerUser = async (req, res) => {
     // Generate tracking code
     const trackingCode = generateTrackingCode(10);
 
+    // Determine role for the first user
+    let role = "user"; // Default role
+    const usersCount = await User.countDocuments();
+    if (usersCount === 0) {
+      role = "admin"; // First user gets the admin role
+    }
+
     const user = new User({
       name,
       username,
@@ -73,21 +64,19 @@ exports.registerUser = async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       trackingCode,
+      role,
     });
-    // Notify admin
-    const admins = await User.find({ role: "admin" });
-    if (admins.length === 0) {
-      // Handle scenario where no admin users are found
-      return res
-        .status(404)
-        .json({ errors: { message: "No admin users found" } });
-    }
 
-    const notification = new Notification({
-      userId: admins._id, // Assuming there's only one admin for simplicity
-      message: `New user registered: ${username}`,
+    // Notify all admins
+    const admins = await User.find({ role: "admin" });
+    const notificationPromises = admins.map((admin) => {
+      const notification = new Notification({
+        userId: admin._id,
+        message: `New user registered: ${username}`,
+      });
+      return notification.save();
     });
-    await notification.save();
+    await Promise.all(notificationPromises);
 
     await user.save();
     res.status(201).json({ user, trackingCode });
@@ -360,5 +349,37 @@ exports.getUnreadNotifications = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a user by ID
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+// Update a user by ID
+exports.updateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };

@@ -92,21 +92,7 @@ UserSchema.pre("save", async function (next) {
     next();
 });
 
-// Trigger notification to admins upon user registration
-UserSchema.post('save', async function (doc) {
-  if (doc.isNew) {
-    try {
-      const admins = await this.model('User').find({ role: 'admin' });
-      const message = `New user registered: ${doc.username}`;
-      for (const admin of admins) {
-        const notification = new Notification({ userId: admin._id, message });
-        await notification.save();
-      }
-    } catch (error) {
-      console.error('Error notifying admins:', error);
-    }
-  }
-});
+
 
 
 module.exports = mongoose.model("User", UserSchema);
